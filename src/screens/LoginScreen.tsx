@@ -1,14 +1,27 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import Input from "../components/inputs/input"; // Importe o componente Input
+import Input from "../components/inputs/input"; 
+import keys from '../mock/keys';
+import { AuthContext } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native'; 
+import { RoutesParams } from "../navigation/routesParams";
+import { StackNavigationProp } from "@react-navigation/stack";
+
+type NavigationProps = StackNavigationProp<RoutesParams>;
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useContext(AuthContext);
+  const navigation = useNavigation<NavigationProps>(); 
 
   const handleLogin = () => {
-    if (email === "user@example.com" && password === "password123") {
+    const user = keys.find(user => user.username === username);
+
+    if (user && user.password === password) {
+      login();
       Alert.alert("Login bem-sucedido!");
+      navigation.navigate('Home'); 
     } else {
       Alert.alert("Credenciais inválidas!");
     }
@@ -19,20 +32,20 @@ export default function LoginScreen() {
       <Text style={styles.title}>Login</Text>
 
       <Input 
-        title="Email" 
-        placeholder="Digite seu email" 
-        value={email} 
-        onChangeText={setEmail} 
-        keyboardType="email-address" 
-        autoCapitalize="none" 
+        title="username"
+        placeholder="Digite seu email"
+        value={username}
+        onChangeText={setUsername}
+        keyboardType="email-address"
+        autoCapitalize="none" error={undefined}      
       />
 
       <Input 
-        title="Senha" 
-        placeholder="Digite sua senha" 
-        value={password} 
-        onChangeText={setPassword} 
-        secureTextEntry 
+        title="Senha"
+        placeholder="Digite sua senha"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry error={undefined}      
       />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
@@ -60,7 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#00728F",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 10, // Altura do botão
+    paddingVertical: 10, 
     paddingHorizontal: 100,
     borderRadius: 15,
     marginTop: 20,
